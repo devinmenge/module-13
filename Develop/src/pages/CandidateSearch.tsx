@@ -41,11 +41,39 @@ const CandidateSearch: React.FC = () => {
     }
   };
 
+  // Sync savedCandidates with local storage on mount and when it changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem('savedCandidates');
+      const parsedSaved = saved ? JSON.parse(saved) : [];
+      setSavedCandidates(parsedSaved);
+
+      // If no candidates are saved, reset the search
+      if (parsedSaved.length === 0) {
+        setCurrentIndex(0);
+        setUsernames([]);
+        setCandidate(null);
+        setError(null);
+        fetchUsernames();
+      }
+    };
+
+    // Initial sync on mount
+    handleStorageChange();
+
+    // Listen for storage changes (e.g., from other tabs or pages)
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   useEffect(() => {
     if (usernames.length === 0) {
       fetchUsernames();
     }
-  }, []);
+  }, [usernames]);
 
   useEffect(() => {
     if (usernames.length > 0 && currentIndex < usernames.length) {
@@ -71,7 +99,7 @@ const CandidateSearch: React.FC = () => {
   return (
     <div>
       <h1>Candidate Search</h1>
-      <Link to="/saved">View Saved Candidates ({savedCandidates.length})</Link>
+      <Link to="/saved-candidates">View Saved Candidates ({savedCandidates.length})</Link>
 
       {error ? (
         <p>{error}</p>

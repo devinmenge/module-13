@@ -20,7 +20,7 @@ const router = createBrowserRouter([
         element: <CandidateSearch />,
       },
       {
-        path: '/SavedCandidates',
+        path: '/saved-candidates', // Changed from '/SavedCandidates' to match the nav link
         element: <SavedCandidates />,
       },
     ],
